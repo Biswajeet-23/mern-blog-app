@@ -1,4 +1,6 @@
-const Post = () => {
+import { formatISO9075 } from "date-fns";
+
+const Post = ({ title, content, summary, cover, createdAt }) => {
   return (
     <div className="post">
       <div className="image">
@@ -8,18 +10,16 @@ const Post = () => {
         />
       </div>
       <div className="post-content">
-        <h2>Quora’s Poe now lets users create and share web apps</h2>
+        <h2>{title}</h2>
         <p className="info">
           <a href="" className="author">
             Biswajeet Sahoo
           </a>
-          <time>2023-01-06 16:45</time>
+          <time>{formatISO9075(new Date(createdAt))}</time>
         </p>
         <p className="summary">
-          Poe, Quora’s subscription-based, cross-platform aggregator for
-          AI-powered chatbots like Anthropic’s Claude and OpenAI’s GPT-4o, has
-          launched a feature called Previews that lets people create interactive
-          apps directly in chats with chatbots.
+          <b>{summary}</b>
+          {content}
         </p>
       </div>
     </div>

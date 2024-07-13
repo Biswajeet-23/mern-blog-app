@@ -2,8 +2,11 @@ import userModel from "../model/userModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
+import fs from "fs";
+import postModel from "../model/postModel.js";
 config();
 
+//user register
 export const userRegister = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -19,6 +22,7 @@ export const userRegister = async (req, res) => {
   }
 };
 
+//user login
 export const userLogin = async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -48,6 +52,7 @@ export const userLogin = async (req, res) => {
   }
 };
 
+//user profile
 export const userProfile = async (req, res) => {
   try {
     const userId = req.userId;
@@ -63,6 +68,7 @@ export const userProfile = async (req, res) => {
   }
 };
 
+//user logout
 export const userLogout = (req, res) => {
   try {
     res.clearCookie("auth_token");
@@ -71,5 +77,45 @@ export const userLogout = (req, res) => {
     res
       .status(500)
       .send({ error: "Something is wrong", errorMessage: err.message });
+  }
+};
+
+//new post
+export const userNewPost = async (req, res) => {
+  try {
+    const { originalname, path } = req.file;
+    const parts = originalname.split(".");
+    const ext = parts[parts.length - 1];
+    const newPath = path + "." + ext;
+    fs.renameSync(path, newPath);
+    const { title, summary, content } = req.body;
+    const postDoc = new postModel({
+      title,
+      summary,
+      content,
+      cover: newPath,
+    });
+    const response = await postDoc.save();
+    res.status(200).send({ message: "Form submitted successfully" });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: "Something is wrong", errorMessage: err.message });
+  }
+};
+
+export const getAllUserPosts = async (req, res) => {
+  try {
+    const userPosts = await postModel.find();
+    if (userPosts) {
+      res.status(200).send(userPosts);
+    } else {
+      res.status(400).send({ message: "No Posts" });
+    }
+    res.status(200);
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: "Something went wrong", errorMessage: err.message });
   }
 };
