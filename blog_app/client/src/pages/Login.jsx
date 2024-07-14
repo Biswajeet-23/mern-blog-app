@@ -9,19 +9,24 @@ const Login = () => {
   const { setUserInfo } = useContext(UserContext);
 
   const handleRegister = async (event) => {
-    event.preventDefault();
-    const response = await fetch("http://127.0.0.4:4000/users/login", {
-      method: "POST",
-      body: JSON.stringify({ username, password }),
-      headers: { "Content-Type": "application/json" },
-      credentials: "include",
-    });
-    if (response.ok) {
-      const data = await response.json();
-      setUserInfo(data);
-      navigate("/");
-    } else {
-      alert("login failed");
+    try {
+      event.preventDefault();
+      const response = await fetch("http://127.0.0.4:4000/users/login", {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const { username, userId } = data;
+        setUserInfo({ id: userId, username: username });
+        navigate("/");
+      } else {
+        alert("login failed");
+      }
+    } catch (err) {
+      console.error(err.message);
     }
   };
 

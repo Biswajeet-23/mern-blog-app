@@ -88,15 +88,23 @@ export const userNewPost = async (req, res) => {
     const ext = parts[parts.length - 1];
     const newPath = path + "." + ext;
     fs.renameSync(path, newPath);
+
+    const authorId = req.userId;
+    const userDetails = await userModel
+      .findById(authorId)
+      .select("-_id -password -__v");
     const { title, summary, content } = req.body;
     const postDoc = new postModel({
+      author: authorId,
       title,
       summary,
       content,
       cover: newPath,
     });
     const response = await postDoc.save();
-    res.status(200).send({ message: "Form submitted successfully" });
+    res
+      .status(200)
+      .send({ message: "Form submitted successfully", data: response });
   } catch (err) {
     res
       .status(500)
@@ -104,15 +112,70 @@ export const userNewPost = async (req, res) => {
   }
 };
 
+//update post
+export const userUpdatePost = async (req, res) => {
+  try {
+    let newPath = null;
+    if (req.file) {
+      const { originalname, path } = req.file;
+      const parts = originalname.split(".");
+      const ext = parts[parts.length - 1];
+      newPath = path + "." + ext;
+      fs.renameSync(path, newPath);
+    }
+    const userId = req.userId;
+    const { id, title, summary, content } = req.body;
+    const postDoc = await postModel.findById(id);
+    const isAuthor = JSON.stringify(postDoc.author) === JSON.stringify(userId);
+    if (!isAuthor) {
+      return res.status(400).send({ message: "you are not the author" });
+    }
+    await postDoc.updateOne({
+      title,
+      summary,
+      content,
+      cover: newPath ? newPath : postDoc.cover,
+    });
+    res.status(200).send({ message: "post updated successfully" });
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: "Something is wrong", errorMessage: err.message });
+  }
+};
+
+//get all blog posts
 export const getAllUserPosts = async (req, res) => {
   try {
-    const userPosts = await postModel.find();
+    const userPosts = await postModel
+      .find()
+      .populate("author", ["username"])
+      .sort({ createdAt: -1 })
+      .limit(20);
     if (userPosts) {
       res.status(200).send(userPosts);
     } else {
       res.status(400).send({ message: "No Posts" });
     }
     res.status(200);
+  } catch (err) {
+    res
+      .status(500)
+      .send({ error: "Something went wrong", errorMessage: err.message });
+  }
+};
+
+export const getPostById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const postDoc = await postModel
+      .findById(id)
+      .populate("author", ["username"]);
+    if (!postDoc) {
+      return res.status(400).send({ message: "Post not found" });
+    } else {
+      res.status(200).send(postDoc);
+    }
   } catch (err) {
     res
       .status(500)

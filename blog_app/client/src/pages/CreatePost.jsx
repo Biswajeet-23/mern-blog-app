@@ -2,21 +2,7 @@ import React, { useState } from "react";
 import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { useNavigate } from "react-router-dom";
-
-const modules = {
-  toolbar: [
-    [{ header: [1, 2, false] }],
-    ["bold", "italic", "underline", "strike", "blockquote"],
-    [
-      { list: "ordered" },
-      { list: "bullet" },
-      { indent: "-1" },
-      { indent: "+1" },
-    ],
-    ["link", "image"],
-    ["clean"],
-  ],
-};
+import Editor from "../components/Editor";
 
 const stripHtml = (html) => {
   return html.replace(/<[^>]*>/g, "");
@@ -41,6 +27,7 @@ const CreatePost = () => {
       const response = await fetch("http://127.0.0.4:4000/users/newPost", {
         method: "POST",
         body: userForm,
+        credentials: "include",
       });
       if (response.status === 200) {
         // const data = response.json();
@@ -70,11 +57,7 @@ const CreatePost = () => {
           onChange={(e) => setSummary(e.target.value)}
         />
         <input type="file" onChange={(e) => setFiles(e.target.files)} />
-        <ReactQuill
-          value={content}
-          modules={modules}
-          onChange={(newValue) => setContent(newValue)}
-        />
+        <Editor value={content} onChange={setContent} />
         <button style={{ marginTop: "5px" }}>Create Post</button>
       </form>
     </>
