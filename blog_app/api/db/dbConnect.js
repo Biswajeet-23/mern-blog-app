@@ -13,7 +13,4 @@ const dbConnect = async () => {
   }
 };
 
-//zFmd6Ar2q8S1N8OW
-//mongodb+srv://biswajeetsahoo0023:zFmd6Ar2q8S1N8OW@cluster0.dxcz0x4.mongodb.net/
-
 export default dbConnect;
