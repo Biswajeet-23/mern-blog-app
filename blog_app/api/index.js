@@ -17,17 +17,26 @@ const __dirname = path.dirname(__filename);
 
 //middlewares
 app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+//LOCAL_HOST
+// app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const PORT = process.env.PORT;
-const host = process.env.HOSTNAME;
+const PORT = process.env.PORT || 4000;
+// const LOCAL_HOST = "127.0.0.4";
 
 //routers
 app.use("/users", userRouter);
 
-app.listen(PORT, host, () => {
-  console.log(`server is running at http://${host}:${PORT}`);
+//PRODUCTION
+app.listen(PORT, () => {
+  console.log(`App is Listening on PORT ${PORT}`);
   dbConnect();
 });
+
+//LOCAL_HOST
+// app.listen(PORT, LOCAL_HOST, () => {
+//   console.log(`App is Listening on http://${LOCAL_HOST}:${PORT}`);
+//   dbConnect();
+// });
