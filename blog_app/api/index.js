@@ -16,7 +16,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 //middlewares
-app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
+app.use(cors({ credentials: true, origin: "https://mern-blog-app-frontend-wkow.onrender.com" }));
 //LOCAL_HOST
 // app.use(cors({ credentials: true, origin: "http://localhost:5173" }));
 app.use(express.json());
